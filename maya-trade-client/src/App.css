@@ -1,0 +1,28 @@
+.homeSlider h1 {
+  font-size: 45px;
+  line-height: 55px;
+  margin: 50px 0 20px 0;
+}
+.homeSlider p {
+  margin: 20px 0;
+}
+
+.d_flex {
+  display: flex !important;
+  justify-content: space-between;
+}
+
+.background {
+  background: #f6f9fc;
+  padding: 50px 0;
+}
+
+@media (max-width: 480px) {
+  .d_flex {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}

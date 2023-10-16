@@ -1,0 +1,31 @@
+.container{
+    max-width: 90%;
+    margin: 0;
+}
+
+.d-flex{
+    display: flex;
+    justify-content: space-between;
+}
+
+.c-flex{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+a{ 
+    text-decoration: none;
+    color: #0000001a;
+
+}
+
+li{
+    list-style: none;
+
+}
+
+.uppercase{
+    text-transform: uppercase;
+
+}
