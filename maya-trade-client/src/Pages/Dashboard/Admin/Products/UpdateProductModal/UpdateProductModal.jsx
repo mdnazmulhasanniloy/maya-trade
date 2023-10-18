@@ -1,39 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { BsXCircleFill } from "react-icons/bs";
-import { useAddProductMutation } from "../../../../../features/productSlice/productApi";
+import { useUpdateProductMutation } from "../../../../../features/productSlice/productApi";
 import { useGetCategoriesQuery } from "../../../../../features/categorySlice/categoryApi";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import moment from "moment";
 import toast from "react-hot-toast";
 
-const AddProductModal = ({ setAddProductModal }) => {
-  const [addProduct, { isLoading, isSuccess, isError }] =
-    useAddProductMutation();
+const UpdateProductModal = ({ setEditProductModal, product }) => {
+  const [updateProduct, updateResult] = useUpdateProductMutation();
   const { data } = useGetCategoriesQuery();
-  const [category, setCategory] = useState({});
-  const [loading, setLoading] = useState(false);
   const categories = data?.data;
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState({});
   const {
     register,
     formState: { errors },
     handleSubmit,
     watch,
     control,
-  } = useForm();
-  const justNow = moment();
-  const dispatch = useDispatch();
+  } = useForm({
+    defaultValues: {
+      title: product?.title,
+      img: product?.img,
+      category: product?.category,
+      price: product?.price,
+      discount: product?.discount,
+      description: product?.description,
+      inStock: product?.inStock,
+    },
+  });
 
   useEffect(() => {
-    if (isLoading) {
+    if (updateResult?.isLoading) {
       toast.loading("Please wait...", { id: "product" });
-    } else if (isSuccess) {
-      setAddProductModal(false);
-      toast.success("Product is successfully added", { id: "product" });
-    } else if (isError) {
+    } else if (updateResult?.isSuccess) {
+      setEditProductModal(false);
+      toast.success("Product is successfully updated", { id: "product" });
+    } else if (updateResult?.isError) {
       toast.error("Something was wrong ", { id: "product" });
     }
-  }, [isLoading, isSuccess, isError]);
+  }, [updateResult]);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
@@ -52,59 +59,51 @@ const AddProductModal = ({ setAddProductModal }) => {
     return () => subscription.unsubscribe();
   });
 
+  // console.log(category);
+
   const onSubmit = async (data) => {
     setLoading(true);
-    const image = data?.img[0];
-    const formData = new FormData();
-    formData.append("image", image);
-
-    fetch(
-      `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_imgHostKey}`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    )
-      .then((res) => res.json())
-      .then((imgData) => {
-        if (imgData?.success) {
-          const productData = {
-            title: data?.title,
-            img: imgData.data.url,
-            price: data?.price,
-            discount: data?.discount,
-            description: data?.description,
-            createAt: justNow,
-            inStock: data?.inStock,
-            category: category,
-            keywords: [],
-            rating: [],
-            like: [],
-          };
-          addProduct(productData);
-          setLoading(false);
+    if (data?.img?.length) {
+      const image = data?.img[0];
+      const formData = new FormData();
+      formData.append("image", image);
+      const res = await fetch(
+        `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_imgHostKey}`,
+        {
+          method: "POST",
+          body: formData,
         }
-      })
-      .catch((error) => {
-        setLoading(false);
-        toast.error(error.message);
-      });
-  };
+      );
 
+      const imgData = await res.json();
+
+      if (imgData?.success) {
+        data = await { ...data, img: imgData.data.url };
+      }
+    }
+
+    data = await { ...data, category: category };
+
+    updateProduct({ id: product?._id, data });
+    console.log("update product");
+    setLoading(false);
+  };
   return (
     <>
       <div className="justify-center items-center flex overflow-x-hidden overflow-y-hidden fixed inset-0 z-[20030] outline-none focus:outline-none h-100 mx-4">
         <div
           className="relative w-full h-[600px] sm:w-[500px] md:w-[750px] lg:w-[900px]  
-        overflow-y-scroll  overflow-hidden py-2 sm:py-4 lg:py-4 px-2 sm:px-4 md:px-6 mx-4 bg-white rounded-lg shadow-2xl"
+    overflow-y-scroll overflow-hidden py-2 sm:py-4 lg:py-4 px-2 sm:px-4 md:px-6 mx-4 bg-white rounded-lg shadow-2xl"
         >
           <div className="px-2 pt-2 flex w-full justify-between">
             <div className="flex items-end justify-center my-5  gap-2">
-              <h1 className="text-2xl font-bold text-center ">Add Product</h1>
+              <h1 className="text-2xl font-bold text-center ">
+                Update Product
+              </h1>
               <div className="h-2 w-2 bg-accent"></div>
             </div>
             <button
-              onClick={() => setAddProductModal(false)}
+              onClick={() => setEditProductModal(false)}
               className="hover:rotate-90 transition-all duration-500"
             >
               <BsXCircleFill color="red" size={25} />
@@ -124,7 +123,6 @@ const AddProductModal = ({ setAddProductModal }) => {
                     type="text"
                     placeholder="Enter Product Name"
                     {...register("title", {
-                      required: "Product Name is required",
                       maxLength: {
                         value: 30,
                         message:
@@ -134,7 +132,7 @@ const AddProductModal = ({ setAddProductModal }) => {
                     className={`input input-bordered w-full ${
                       errors.title ? "input-error" : "input-accent"
                     }
-                    `}
+                `}
                   />
                   {errors.title && (
                     <p className=" text-red-600 mt-3">{errors.title.message}</p>
@@ -148,13 +146,11 @@ const AddProductModal = ({ setAddProductModal }) => {
                   </label>
                   <input
                     type="file"
-                    {...register("img", {
-                      required: "Product image is required",
-                    })}
+                    {...register("img")}
                     className={`file-input file-input-bordered ${
                       errors.img ? "file-input-error" : "file-input-accent"
                     }
-                    `}
+                `}
                   />
                   {errors.img && (
                     <p className=" text-red-600 mt-3">{errors.img.message}</p>
@@ -167,9 +163,7 @@ const AddProductModal = ({ setAddProductModal }) => {
                     <span className="label-text">Category</span>
                   </label>
                   <select
-                    {...register("category", {
-                      required: "Product Name is required",
-                    })}
+                    {...register("category")}
                     className={`select w-full ${
                       errors?.category ? "select-error" : "select-accent"
                     }`}
@@ -196,7 +190,6 @@ const AddProductModal = ({ setAddProductModal }) => {
                     type="text"
                     placeholder="Enter product price"
                     {...register("price", {
-                      required: "Price filed is required",
                       pattern: {
                         value: /^\d+(\.\d{0,2})?$/,
                         message: "Please enter number type value",
@@ -247,9 +240,7 @@ const AddProductModal = ({ setAddProductModal }) => {
                   </label>
                   <textarea
                     placeholder="Enter Description"
-                    {...register("description", {
-                      required: "description",
-                    })}
+                    {...register("description")}
                     className={`textarea ${
                       errors?.description ? "textarea-error" : "textarea-accent"
                     }`}
@@ -273,11 +264,8 @@ const AddProductModal = ({ setAddProductModal }) => {
                         type="radio"
                         id="inStock"
                         name="radio-4"
-                        {...register("inStock", {
-                          required: "inStock is required",
-                        })}
+                        {...register("inStock")}
                         className="radio radio-accent"
-                        checked
                       />
                       <label
                         for="inStock"
@@ -292,9 +280,7 @@ const AddProductModal = ({ setAddProductModal }) => {
                         type="radio"
                         id="sold"
                         name="radio-4"
-                        {...register("inStock", {
-                          required: "inStock is required",
-                        })}
+                        {...register("inStock")}
                         className="radio radio-accent"
                       />
                       <label
@@ -312,17 +298,17 @@ const AddProductModal = ({ setAddProductModal }) => {
                     </p>
                   )}
                 </div>
-                {/* inStock field end */}{" "}
+                {/* inStock field end */}
               </div>
               <button
                 type="submit"
-                disabled={isLoading || loading}
-                className="my-10 btn btn-accent"
+                disabled={updateResult?.isLoading || loading}
+                className="btn btn-accent my-5"
               >
-                {(isLoading || loading) && (
+                {(updateResult?.isLoading || loading) && (
                   <span className="loading loading-spinner"></span>
                 )}
-                {isLoading || loading ? "Loading..." : "Submit"}
+                {updateResult?.isLoading || loading ? " Updating..." : "Update"}
               </button>
             </form>
             {/* Form */}
@@ -334,4 +320,4 @@ const AddProductModal = ({ setAddProductModal }) => {
   );
 };
 
-export default AddProductModal;
+export default UpdateProductModal;

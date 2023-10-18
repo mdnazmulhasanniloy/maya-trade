@@ -54,7 +54,7 @@ const HomePageProduct = () => {
           <h1 className="text-3xl font-bold">Products</h1>
           <button className="">
             See All Products{" "}
-            <BsArrowRight className="2xl inline animate-bounce " />
+            <BsArrowRight className="2xl rotate-45 inline animate-ping  " />
           </button>
         </div>
         <div className=" w-11/12 mx-auto">

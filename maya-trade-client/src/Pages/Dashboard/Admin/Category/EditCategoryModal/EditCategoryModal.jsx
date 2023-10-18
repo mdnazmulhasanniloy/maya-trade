@@ -3,66 +3,72 @@ import { BsXCircleFill } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import moment from "moment";
 import toast from "react-hot-toast";
-import {
-  useAddCategoryMutation,
-  useGetCategoriesQuery,
-  useUpdateCategoryMutation,
-} from "../../../../../features/categorySlice/categoryApi";
+import { useUpdateCategoryMutation } from "../../../../../features/categorySlice/categoryApi";
 
 const EditCategoryModal = ({ setEditCategoryModal, CategoryData }) => {
-  const [addCategory, { isLoading, isSuccess, isError }] =
-    useUpdateCategoryMutation();
+  const [updateCategory, updateResult] = useUpdateCategoryMutation();
   const {
     register,
     formState: { errors },
     handleSubmit,
     control,
   } = useForm({
-    defaultValues: { name: CategoryData?.name, img: CategoryData?.img },
+    defaultValues: { name: CategoryData?.name },
   });
   const [loading, setLoading] = useState(false);
-  const justNow = moment();
 
   useEffect(() => {
-    if (isLoading) {
+    if (updateResult?.isLoading) {
       toast.loading("Please wait...", { id: "Category" });
-    } else if (isSuccess) {
+    } else if (updateResult?.isSuccess) {
       setEditCategoryModal(false);
-      toast.success("Category is successfully added", { id: "Category" });
-    } else if (isError) {
+      toast.success("Category is successfully updated", { id: "Category" });
+    } else if (updateResult?.isError) {
       toast.error("Something was wrong ", { id: "Category" });
     }
-  }, [isLoading, isSuccess, isError]);
+  }, [updateResult]);
 
   const onSubmit = async (data) => {
     setLoading(true);
-    const image = data?.img[0];
-    const formData = new FormData();
-    formData.append("image", image);
 
-    fetch(
-      `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_imgHostKey}`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    )
-      .then((res) => res.json())
-      .then((imgData) => {
-        if (imgData?.success) {
-          const categoryData = {
-            name: data?.name,
-            img: imgData.data.url,
-            createAt: justNow,
-          };
-          addCategory(categoryData);
-          setLoading(false);
+    if (data?.img?.length) {
+      const image = data?.img[0];
+      const formData = new FormData();
+      formData.append("image", image);
+
+      fetch(
+        `https://api.imgbb.com/1/upload?key=${process.env.REACT_APP_imgHostKey}`,
+        {
+          method: "POST",
+          body: formData,
         }
-      })
-      .catch((error) => {
-        setLoading(false);
-        toast.error(error.message);
-      });
+      )
+        .then((res) => res.json())
+        .then((imgData) => {
+          if (imgData?.success) {
+            const categoryUpdateData = {
+              name: data?.name,
+              img: imgData.data.url,
+            };
+            console.log("hello", categoryUpdateData);
+            updateCategory({ id: CategoryData?._id, data: categoryUpdateData });
+            setLoading(false);
+            return;
+          }
+        })
+        .catch((error) => {
+          setLoading(false);
+          toast.error(error.message);
+          return;
+        });
+    } else {
+      const categoryUpdateData = {
+        name: data?.name,
+      };
+      console.log(categoryUpdateData);
+      updateCategory({ id: CategoryData?._id, data: categoryUpdateData });
+      return;
+    }
   };
 
   return (
@@ -122,9 +128,7 @@ const EditCategoryModal = ({ setEditCategoryModal, CategoryData }) => {
                   </label>
                   <input
                     type="file"
-                    {...register("img", {
-                      required: "Category image is required",
-                    })}
+                    {...register("img")}
                     className={`file-input file-input-bordered ${
                       errors.img ? "file-input-error" : "file-input-accent"
                     }
@@ -140,13 +144,13 @@ const EditCategoryModal = ({ setEditCategoryModal, CategoryData }) => {
               </div>
               <button
                 type="submit"
-                disabled={isLoading || loading}
+                disabled={updateResult?.isLoading || loading}
                 className="btn btn-accent"
               >
-                {(isLoading || loading) && (
+                {(updateResult?.isLoading || loading) && (
                   <span className="loading loading-spinner"></span>
                 )}
-                {isLoading || loading ? "Loading..." : "Submit"}
+                {updateResult?.isLoading || loading ? "Loading..." : "Submit"}
               </button>
             </form>
             {/* Form */}

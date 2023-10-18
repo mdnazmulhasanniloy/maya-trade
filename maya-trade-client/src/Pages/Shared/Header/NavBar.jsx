@@ -21,6 +21,7 @@ import { GrClose } from "react-icons/gr";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 const NavBar = () => {
+  const carts = useSelector((state) => state?.cart?.carts);
   const [show, setShow] = useState(null);
   const [profile, setProfile] = useState(false);
   const [product, setProduct] = useState(false);
@@ -105,7 +106,7 @@ const NavBar = () => {
                         <span
                           className={`${"px-2"} absolute -top-5 -right-5 py-1 rounded-full text-xs text-white bg-red-500`}
                         >
-                          00{/* {cart?.length} */}
+                          {carts?.length}
                         </span>
                       </div>
                     </Link>
@@ -214,7 +215,7 @@ const NavBar = () => {
                     <span
                       className={`${"px-2"} absolute -top-5 -right-5 py-1 rounded-full text-xs text-white bg-red-500`}
                     >
-                      00{/* {cart?.length} */}
+                      {carts?.length}
                     </span>
                   </div>
                 </Link>

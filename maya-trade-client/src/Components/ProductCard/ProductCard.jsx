@@ -24,7 +24,7 @@ const ProductCard = ({ product }) => {
         </div>
         <div className="product-details">
           <h3 className=" font-normal text-lg">{product?.name}</h3>
-          <div className="rating">
+          <div onClick={e=>console.log(e.target.value)} className="rating">
             <input type="radio" name="rating-1" className="mask mask-star" />
             <input
               type="radio"

@@ -15,6 +15,22 @@ export const productsApi = apiSlice?.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      // async onQueryStarted(data, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const res = await queryFulfilled;
+      //     dispatch(getProduct());
+      //   } catch (error) {}
+      // },
+      invalidatesTags: ["Products"],
+    }),
+
+    // edit product
+    updateProduct: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/product/update/${id}`,
+        method: "PUT",
+        body: data,
+      }),
       invalidatesTags: ["Products"],
     }),
 
@@ -31,5 +47,6 @@ export const productsApi = apiSlice?.injectEndpoints({
 export const {
   useGetProductQuery,
   useAddProductMutation,
+  useUpdateProductMutation,
   useRemoveProductMutation,
 } = productsApi;

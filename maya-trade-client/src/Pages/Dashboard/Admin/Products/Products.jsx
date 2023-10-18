@@ -11,14 +11,18 @@ import {
 } from "../../../../features/productSlice/productApi";
 import moment from "moment";
 import toast from "react-hot-toast";
+import UpdateProductModal from "./UpdateProductModal/UpdateProductModal";
 
 const Products = () => {
   const { data, isLoading, isError } = useGetProductQuery();
   const [deleteProduct, removeResult] = useRemoveProductMutation();
   const [addProductModal, setAddProductModal] = useState(false);
+  const [editProductModal, setEditProductModal] = useState(false);
+  const [product, setProduct] = useState(null);
   const [searchData, setSearchData] = useState("");
   // console.log(searchData);
   const products = data?.data;
+  console.log(products);
 
   useEffect(() => {
     if (removeResult?.isLoading) {
@@ -169,7 +173,7 @@ const Products = () => {
                               {product?.discount}
                             </td>
                             <td class="p-2 whitespace-nowrap">
-                              {product?.inStock ? "In Stock" : "Sold"}
+                              {product?.inStock === "true" ? "InStock" : "Sold"}
                             </td>
                             <td class="p-2 whitespace-nowrap flex gap-2">
                               <div class="mx-auto flex w-[100px] gap-2">
@@ -185,6 +189,10 @@ const Products = () => {
                                 </button>
                                 <button
                                   type="button"
+                                  onClick={() => (
+                                    setProduct(product),
+                                    setEditProductModal(true)
+                                  )}
                                   className="px-1 py-1 bg-green-200 rounded-3xl hover:cursor-pointer hover:scale-125 transition-scale duration-500"
                                 >
                                   {/* svg */}
@@ -212,6 +220,12 @@ const Products = () => {
 
       {addProductModal && (
         <AddProductModal setAddProductModal={setAddProductModal} />
+      )}
+      {editProductModal && (
+        <UpdateProductModal
+          setEditProductModal={setEditProductModal}
+          product={product}
+        />
       )}
     </>
   );
