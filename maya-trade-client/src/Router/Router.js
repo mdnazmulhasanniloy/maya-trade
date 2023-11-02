@@ -15,6 +15,7 @@ import Orders from "./../Pages/Dashboard/Admin/Orders/Orders";
 import ProductList from "./../Pages/Dashboard/Admin/ProductList/ProductList";
 import Products from "../Pages/Dashboard/Admin/Products/Products";
 import Category from "../Pages/Dashboard/Admin/Category/Category";
+import PaymentSuccess from "../Pages/Dashboard/Buyers/PaymentSuccess/PaymentSuccess";
 
 export const Router = createBrowserRouter([
   {
@@ -79,6 +80,10 @@ export const Router = createBrowserRouter([
       {
         path: "dashboard/orders",
         element: <Orders />,
+      },
+      {
+        path: "dashboard/payment/success/:tranId",
+        element: <PaymentSuccess />,
       },
     ],
   },

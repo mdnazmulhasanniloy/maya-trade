@@ -1,0 +1,33 @@
+/* pagination button */
+
+.pagination a {
+  font-size: 17px;
+  margin: 0 10px;
+  width: 21px;
+  height: 21px;
+  display: inline-block;
+  padding: 6px;
+}
+
+.pagination {
+  text-align: center;
+  margin: 15px 0;
+}
+
+ul.pagination-menu li {
+  display: inline-block;
+  background: #e0e0e0;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+ul.pagination-menu li.selected {
+  background: #00a63a;
+  color: #fff;
+}
+ul.pagination-menu li.next.disabled {
+  visibility: hidden;
+}
+ul.pagination-menu li.previous.disabled {
+  visibility: hidden;
+}

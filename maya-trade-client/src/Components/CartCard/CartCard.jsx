@@ -20,9 +20,15 @@ const CartCard = ({ product, price }) => {
         <div className="py-4 flex flex-col justify-between">
           <h1 className="text-xl font-bold">{product?.title}</h1>
           <p className="text-lg">
-            {product?.price} * {product?.quantity}
+            {"("}
+            {product?.price} {product?.discount && ` - ${product?.discount}%)`}*
+            {product?.quantity} =
             <span className="text-[#e94560] ml-5">
-              {product?.price * product?.quantity}
+              {product?.discount.length
+                ? product?.price *
+                  ((100 - product?.discount) / 100) *
+                  product?.quantity
+                : product?.price * product?.quantity}
             </span>
           </p>
         </div>

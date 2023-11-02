@@ -9,13 +9,19 @@ import {
   useGetProductQuery,
   useRemoveProductMutation,
 } from "../../../../features/productSlice/productApi";
-import moment from "moment";
 import toast from "react-hot-toast";
 import UpdateProductModal from "./UpdateProductModal/UpdateProductModal";
+import ReactPaginate from "react-paginate";
+import Pagination from "../../../Shared/Pagination/Pagination";
 
 const Products = () => {
   const { data, isLoading, isError } = useGetProductQuery();
   const [deleteProduct, removeResult] = useRemoveProductMutation();
+
+  //pagination state
+  const [itemOffset, setItemOffset] = useState(0);
+  const [items, setData] = useState([]);
+
   const [addProductModal, setAddProductModal] = useState(false);
   const [editProductModal, setEditProductModal] = useState(false);
   const [product, setProduct] = useState(null);
@@ -41,37 +47,27 @@ const Products = () => {
   const handelToDeleteProduct = (_id) => {
     deleteProduct(_id);
   };
-  // console.log(products);
-  // const products = [
-  //   {
-  //     _id: 1212,
-  //     title: "Phone",
-  //     img: "",
-  //     price: "300",
-  //     discount: "20",
-  //     disruption: "",
-  //     createAt: moment(),
-  //     inStock: true,
-  //     category: { categoryId: "", categoryName: "Geist" },
-  //     keywords: [],
-  //     rating: ["UserId"],
-  //     like: ["UserId"],
-  //   },
-  //   {
-  //     _id: 121212,
-  //     title: "Phone",
-  //     img: "",
-  //     price: "300",
-  //     discount: "20",
-  //     disruption: "",
-  //     createAt: moment(),
-  //     inStock: true,
-  //     category: { categoryId: "", categoryName: "Geist" },
-  //     keywords: [],
-  //     rating: ["UserId"],
-  //     like: ["UserId"],
-  //   },
-  // ];
+
+  //pagination
+
+  useEffect(() => {
+    setData(data?.data);
+  }, [data]);
+
+  const itemsPerPage = 4;
+
+  const endOffset = itemOffset + itemsPerPage;
+
+  const currentItems = items?.slice(itemOffset, endOffset);
+  const pageCount = Math?.ceil(items?.length / itemsPerPage);
+
+  const handlePageClick = (event) => {
+    const newOffset = (event?.selected * itemsPerPage) % items?.length;
+    console.log(
+      `User requested page number ${event?.selected}, which is offset ${newOffset}`
+    );
+    setItemOffset(newOffset);
+  };
   return (
     <>
       <div className="w-full mt-5">
@@ -144,8 +140,8 @@ const Products = () => {
                     </tr>
                   </thead>
                   <tbody class="text-sm divide-y divide-gray-100">
-                    {products?.length > 0 &&
-                      products
+                    {currentItems?.length > 0 &&
+                      currentItems
                         ?.filter((product) =>
                           product?.title
                             ?.toLocaleLowerCase()
@@ -216,6 +212,11 @@ const Products = () => {
           </div>
         </div>
         {/* Tables */}
+        {/* pagination */}
+
+        <div>
+          <Pagination handlePageClick={handlePageClick} pageCount={pageCount} />
+        </div>
       </div>
 
       {addProductModal && (

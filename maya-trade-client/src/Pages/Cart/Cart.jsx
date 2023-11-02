@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import emptyImg from "../../assets/EmptyCart/EmptyCart.jpg";
 import CartCard from "../../Components/CartCard/CartCard";
+import { useCheckoutMutation } from "../../features/payment/paymentApi";
 
 const Cart = () => {
   const carts = useSelector((state) => state?.cart?.carts);
+  const {
+    user: { _id },
+  } = useSelector((state) => state?.auth);
+  const [checkout, { isLoading, isSuccess, isError }] = useCheckoutMutation();
   const [price, setPrice] = useState({
     subtotalPrice: 0,
     totalPrice: 0,
@@ -13,7 +18,11 @@ const Cart = () => {
 
   useEffect(() => {
     const subTotal = carts.reduce((total, cartItem) => {
-      return total + cartItem.price * cartItem.quantity;
+      let discount = 1;
+      if (cartItem?.discount > 0) {
+        discount = (100 - cartItem?.discount) / 100;
+      }
+      return total + cartItem?.price * discount * cartItem?.quantity;
     }, 0);
 
     const totalPrice = subTotal + price.deliveryFee; // Calculate totalPrice here
@@ -25,8 +34,8 @@ const Cart = () => {
     });
   }, [carts, price?.deliveryFee, setPrice]); // Include only carts and price.deliveryFee as dependencies
 
+  // Check if the cart is empty correctly
   if (carts?.length === 0) {
-    // Check if the cart is empty correctly
     return (
       <div className="h-screen w-screen flex flex-col items-center mt-10">
         <img src={emptyImg} className="w-96" alt="" />
@@ -35,6 +44,15 @@ const Cart = () => {
       </div>
     );
   }
+
+  const handelToCheckout = async () => {
+    let ProductInfo = [];
+    const product = await carts?.map((product) =>
+      ProductInfo.push({ _id: product?._id, quantity: product?.quantity })
+    );
+    console.log(ProductInfo);
+    checkout({ ProductInfo, userId: _id, price: price?.totalPrice });
+  };
 
   return (
     <section className="min-h-[100vh] bg-[#d7e3f0] pt-10">
@@ -74,7 +92,12 @@ const Cart = () => {
               </h1>
             </div>
             <div className="flex justify-end mt-5">
-              <button className="px-4 py-2 rounded-lg border-2 border-[#e94560] text-white bg-[#e94560] hover:text-[#e94560] hover:bg-white transition-all duration-500">
+              <button
+                disabled={isLoading}
+                onClick={handelToCheckout}
+                className="px-4 py-2 flex items-center justify-between rounded-lg border-2 border-[#e94560] text-white bg-[#e94560] hover:text-[#e94560] hover:bg-white transition-all duration-500"
+              >
+                {isLoading && <span className="loading loading-spinner"></span>}
                 Checkout
               </button>
             </div>

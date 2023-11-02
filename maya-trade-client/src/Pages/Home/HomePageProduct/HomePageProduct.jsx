@@ -1,8 +1,11 @@
 import React from "react";
 import ProductCard from "../../../Components/ProductCard/ProductCard";
 import { BsArrowRight } from "react-icons/bs";
+import { useGetProductQuery } from "../../../features/productSlice/productApi";
 const HomePageProduct = () => {
-  const products = [
+  const { data, isLoading, isError } = useGetProductQuery();
+  const products = data?.data;
+  const nn = [
     {
       _id: 1,
       discount: 50,

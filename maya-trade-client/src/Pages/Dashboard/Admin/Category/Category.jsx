@@ -11,17 +11,23 @@ import {
 } from "../../../../features/categorySlice/categoryApi";
 import toast from "react-hot-toast";
 import EditCategoryModal from "./EditCategoryModal/EditCategoryModal";
+import Pagination from "../../../Shared/Pagination/Pagination";
 
 const Category = () => {
+  const { data, isLoading, isSuccess, isError } = useGetCategoriesQuery();
+  const [deleteCategory, removeResult] = useRemoveCategoryMutation();
+
   const [addCategoryModal, setAddCategoryModal] = useState(false);
   const [editCategoryModal, setEditCategoryModal] = useState(false);
-  const [CategoryData, setCategoryData] = useState(null);
-  const [deleteCategory, removeResult] = useRemoveCategoryMutation();
-  const { data, isLoading, isSuccess, isError } = useGetCategoriesQuery();
-  const [searchData, setSearchData] = useState("");
-  const categories = data?.data;
 
-  console.log(categories);
+  const [CategoryData, setCategoryData] = useState(null);
+  const [searchData, setSearchData] = useState("");
+
+  //pagination state
+  const [itemOffset, setItemOffset] = useState(0);
+  const [items, setData] = useState([]);
+
+  const categories = data?.data;
 
   useEffect(() => {
     if (removeResult?.isLoading) {
@@ -37,9 +43,29 @@ const Category = () => {
     }
   }, [removeResult]);
 
+  //delete category
   const handelToDeleteCategory = (id) => {
-    // console.log(id);
     deleteCategory(id);
+  };
+
+  //pagination
+  useEffect(() => {
+    setData(data?.data);
+  }, [data]);
+
+  const itemsPerPage = 6;
+
+  const endOffset = itemOffset + itemsPerPage;
+
+  const currentItems = items?.slice(itemOffset, endOffset);
+  const pageCount = Math?.ceil(items?.length / itemsPerPage);
+
+  const handlePageClick = (event) => {
+    const newOffset = (event?.selected * itemsPerPage) % items?.length;
+    console.log(
+      `User requested page number ${event?.selected}, which is offset ${newOffset}`
+    );
+    setItemOffset(newOffset);
   };
   return (
     <>
@@ -103,8 +129,8 @@ const Category = () => {
                     </tr>
                   </thead>
                   <tbody class="text-sm divide-y divide-gray-100">
-                    {categories?.length > 0 &&
-                      categories
+                    {currentItems?.length > 0 &&
+                      currentItems
                         ?.filter((category) =>
                           category.name
                             .toLowerCase()
@@ -167,6 +193,11 @@ const Category = () => {
           </div>
         </div>
         {/* Tables */}
+        {/* pagination */}
+
+        <div>
+          <Pagination handlePageClick={handlePageClick} pageCount={pageCount} />
+        </div>
       </div>
 
       {addCategoryModal && (
