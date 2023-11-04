@@ -28,7 +28,7 @@ const Products = () => {
   const [searchData, setSearchData] = useState("");
   // console.log(searchData);
   const products = data?.data;
-  console.log(products);
+  // console.log(products);
 
   useEffect(() => {
     if (removeResult?.isLoading) {
@@ -38,7 +38,7 @@ const Products = () => {
       toast.success("Product successfully delete", { id: "removeProduct" });
     }
     if (removeResult?.isError) {
-      toast.success("something was wrong product deleting failed", {
+      toast.error("something was wrong product deleting failed", {
         id: "removeProduct",
       });
     }
@@ -131,7 +131,7 @@ const Products = () => {
                         <div class="font-semibold text-left">Discount</div>
                       </th>
                       <th class="p-2 whitespace-nowrap">
-                        <div class="font-semibold text-left">InStock</div>
+                        <div class="font-semibold text-left">status</div>
                       </th>
 
                       <th class="p-2 whitespace-nowrap">
@@ -140,6 +140,7 @@ const Products = () => {
                     </tr>
                   </thead>
                   <tbody class="text-sm divide-y divide-gray-100">
+                    {console.log(currentItems)}
                     {currentItems?.length > 0 &&
                       currentItems
                         ?.filter((product) =>
@@ -166,10 +167,11 @@ const Products = () => {
                               {product?.price}
                             </td>
                             <td class="p-2 whitespace-nowrap">
-                              {product?.discount}
+                              {product?.status === "discount" &&
+                                product?.discount}
                             </td>
                             <td class="p-2 whitespace-nowrap">
-                              {product?.inStock === "true" ? "InStock" : "Sold"}
+                              {product?.status}
                             </td>
                             <td class="p-2 whitespace-nowrap flex gap-2">
                               <div class="mx-auto flex w-[100px] gap-2">

@@ -4,7 +4,7 @@ const categoryApi = apiSlice?.injectEndpoints({
   endpoints: (builder) => ({
     // get categories
     getCategories: builder.query({
-      query: () => "/categories",
+      query: () => "/category",
       providesTags: ["categories"],
     }),
 
@@ -21,7 +21,7 @@ const categoryApi = apiSlice?.injectEndpoints({
     // update category
     updateCategory: builder.mutation({
       query: ({ id, data }) => ({
-        url: `/category/update/${id}`,
+        url: `/category/${id}`,
         method: "PUT",
         body: data,
       }),
@@ -31,7 +31,7 @@ const categoryApi = apiSlice?.injectEndpoints({
     // delete category
     removeCategory: builder.mutation({
       query: (id) => ({
-        url: `/category/delete/${id}`,
+        url: `/category/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["categories"],

@@ -47,7 +47,6 @@ const AddCategoryModal = ({ setAddCategoryModal }) => {
           const categoryData = {
             name: data?.name,
             img: imgData.data.url,
-            createAt: justNow,
           };
           addCategory(categoryData);
           setLoading(false);

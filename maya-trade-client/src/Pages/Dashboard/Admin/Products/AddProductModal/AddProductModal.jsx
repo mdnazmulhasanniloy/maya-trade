@@ -13,16 +13,18 @@ const AddProductModal = ({ setAddProductModal }) => {
   const { data } = useGetCategoriesQuery();
   const [category, setCategory] = useState({});
   const [loading, setLoading] = useState(false);
+  const [discountField, setDiscountField] = useState(false);
   const categories = data?.data;
   const {
     register,
     formState: { errors },
     handleSubmit,
     watch,
-    control,
-  } = useForm();
-  const justNow = moment();
-  const dispatch = useDispatch();
+  } = useForm({
+    defaultValues: {
+      discount: 0,
+    },
+  });
 
   useEffect(() => {
     if (isLoading) {
@@ -48,6 +50,15 @@ const AddProductModal = ({ setAddProductModal }) => {
           }
         });
       }
+      if (name === "status") {
+        if (value.status === "discount") {
+          setDiscountField(true);
+          return;
+        } else {
+          setDiscountField(false);
+          return;
+        }
+      }
     });
     return () => subscription.unsubscribe();
   });
@@ -71,15 +82,11 @@ const AddProductModal = ({ setAddProductModal }) => {
           const productData = {
             title: data?.title,
             img: imgData.data.url,
-            price: data?.price,
-            discount: data?.discount,
-            description: data?.description,
-            createAt: justNow,
-            inStock: data?.inStock,
             category: category,
-            keywords: [],
-            rating: [],
-            like: [],
+            price: parseInt(data?.price),
+            discount: parseInt(data?.discount),
+            description: data?.description,
+            status: data?.status,
           };
           addProduct(productData);
           setLoading(false);
@@ -213,32 +220,59 @@ const AddProductModal = ({ setAddProductModal }) => {
                   )}
                 </div>
                 {/* price field end */}
-                {/* discount field start */}
+                {/* status field start */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Discount</span>
+                    <span className="label-text">Status</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="enter Discount discount percentage"
-                    {...register("discount", {
-                      pattern: {
-                        value: /^\d+(\.\d{0,2})?$/,
-                        message: "Please enter number type value",
-                      },
+                  <select
+                    {...register("status", {
+                      required: "Product status is required",
                     })}
-                    className={
-                      errors.discount
-                        ? "input input-bordered input-error"
-                        : "input input-bordered input-accent"
-                    }
-                  />
-                  {errors.discount && (
+                    className={`select w-full ${
+                      errors?.status ? "select-error" : "select-accent"
+                    }`}
+                  >
+                    <option selected>in-stock</option>
+                    <option>out-of-stock</option>
+                    <option>discount</option>
+                  </select>
+
+                  {errors.status && (
                     <p className=" text-red-600 mt-3">
-                      {errors.discount.message}
+                      {errors.status.message}
                     </p>
                   )}
                 </div>
+                {/* status field end */}
+                {/* discount field start */}
+                {discountField && (
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Discount</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="enter Discount discount percentage"
+                      {...register("discount", {
+                        pattern: {
+                          value: /^\d+(\.\d{0,2})?$/,
+                          message: "Please enter number type value",
+                        },
+                      })}
+                      className={
+                        errors.discount
+                          ? "input input-bordered input-error"
+                          : "input input-bordered input-accent"
+                      }
+                    />
+                    {errors.discount && (
+                      <p className=" text-red-600 mt-3">
+                        {errors.discount.message}
+                      </p>
+                    )}
+                  </div>
+                )}
                 {/* discount field end */}
                 {/* description field start */}
                 <div className="form-control">
@@ -261,58 +295,6 @@ const AddProductModal = ({ setAddProductModal }) => {
                   )}
                 </div>
                 {/* description field end */}
-                {/* inStock field start */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">InStock</span>
-                  </label>
-                  <div className="flex items-center gap-5 ml-5">
-                    <div className="flex items-center gap-3">
-                      <input
-                        value={true}
-                        type="radio"
-                        id="inStock"
-                        name="radio-4"
-                        {...register("inStock", {
-                          required: "inStock is required",
-                        })}
-                        className="radio radio-accent"
-                        checked
-                      />
-                      <label
-                        for="inStock"
-                        className="hover:text-accent hover:cursor-pointer"
-                      >
-                        In stock
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <input
-                        value={false}
-                        type="radio"
-                        id="sold"
-                        name="radio-4"
-                        {...register("inStock", {
-                          required: "inStock is required",
-                        })}
-                        className="radio radio-accent"
-                      />
-                      <label
-                        for="sold"
-                        className="hover:text-accent hover:cursor-pointer"
-                      >
-                        Sold
-                      </label>
-                    </div>
-                  </div>
-
-                  {errors.inStock && (
-                    <p className=" text-red-600 mt-3">
-                      {errors.inStock.message}
-                    </p>
-                  )}
-                </div>
-                {/* inStock field end */}{" "}
               </div>
               <button
                 type="submit"

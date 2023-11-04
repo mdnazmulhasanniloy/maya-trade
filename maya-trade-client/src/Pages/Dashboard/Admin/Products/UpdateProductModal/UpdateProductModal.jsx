@@ -12,7 +12,9 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
   const { data } = useGetCategoriesQuery();
   const categories = data?.data;
   const [loading, setLoading] = useState(false);
-  const [category, setCategory] = useState({});
+  const [category, setCategory] = useState({ ...product?.category });
+  const [discountField, setDiscountField] = useState(false);
+
   const {
     register,
     formState: { errors },
@@ -23,13 +25,14 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
     defaultValues: {
       title: product?.title,
       img: product?.img,
-      category: product?.category,
+      category: category,
       price: product?.price,
-      discount: product?.discount,
       description: product?.description,
-      inStock: product?.inStock,
+      status: product?.status,
     },
   });
+
+  // console.log(product);
 
   useEffect(() => {
     if (updateResult?.isLoading) {
@@ -55,15 +58,22 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
           }
         });
       }
+      if (name === "status") {
+        if (value.status === "discount") {
+          setDiscountField(true);
+          return;
+        } else {
+          setDiscountField(false);
+          return;
+        }
+      }
     });
     return () => subscription.unsubscribe();
   });
 
-  // console.log(category);
-
   const onSubmit = async (data) => {
     setLoading(true);
-    if (data?.img?.length) {
+    if (data?.img?.length > 0) {
       const image = data?.img[0];
       const formData = new FormData();
       formData.append("image", image);
@@ -82,12 +92,20 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
       }
     }
 
-    data = await { ...data, category: category };
-
+    data = await {
+      ...data,
+      category: category,
+      discount: parseInt(data?.discount),
+    };
+    if (data?.status !== "discount") {
+      data = await { ...data, discount: 0 };
+    }
+    // console.log("hello", data?.status);
     updateProduct({ id: product?._id, data });
-    console.log("update product");
+    // console.log("update product");
     setLoading(false);
   };
+  // console.log(discountField);
   return (
     <>
       <div className="justify-center items-center flex overflow-x-hidden overflow-y-hidden fixed inset-0 z-[20030] outline-none focus:outline-none h-100 mx-4">
@@ -132,7 +150,7 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                     className={`input input-bordered w-full ${
                       errors.title ? "input-error" : "input-accent"
                     }
-                `}
+                    `}
                   />
                   {errors.title && (
                     <p className=" text-red-600 mt-3">{errors.title.message}</p>
@@ -146,11 +164,11 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                   </label>
                   <input
                     type="file"
-                    {...register("img")}
+                    {...register("img", {})}
                     className={`file-input file-input-bordered ${
                       errors.img ? "file-input-error" : "file-input-accent"
                     }
-                `}
+                    `}
                   />
                   {errors.img && (
                     <p className=" text-red-600 mt-3">{errors.img.message}</p>
@@ -163,13 +181,17 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                     <span className="label-text">Category</span>
                   </label>
                   <select
-                    {...register("category")}
+                    {...register("category", {})}
                     className={`select w-full ${
                       errors?.category ? "select-error" : "select-accent"
                     }`}
                   >
                     {categories?.map((each) => (
-                      <option key={each?._id} value={each?._id}>
+                      <option
+                        key={each?._id}
+                        value={each?._id}
+                        selected={each?._id === product?.category?.category_id}
+                      >
                         {each?.name}
                       </option>
                     ))}
@@ -190,6 +212,7 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                     type="text"
                     placeholder="Enter product price"
                     {...register("price", {
+                      required: "Price filed is required",
                       pattern: {
                         value: /^\d+(\.\d{0,2})?$/,
                         message: "Please enter number type value",
@@ -206,32 +229,59 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                   )}
                 </div>
                 {/* price field end */}
-                {/* discount field start */}
+                {/* status field start */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Discount</span>
+                    <span className="label-text">Status</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder="enter Discount discount percentage"
-                    {...register("discount", {
-                      pattern: {
-                        value: /^\d+(\.\d{0,2})?$/,
-                        message: "Please enter number type value",
-                      },
+                  <select
+                    {...register("status", {
+                      required: "Product status is required",
                     })}
-                    className={
-                      errors.discount
-                        ? "input input-bordered input-error"
-                        : "input input-bordered input-accent"
-                    }
-                  />
-                  {errors.discount && (
+                    className={`select w-full ${
+                      errors?.status ? "select-error" : "select-accent"
+                    }`}
+                  >
+                    <option selected>in-stock</option>
+                    <option>out-of-stock</option>
+                    <option>discount</option>
+                  </select>
+
+                  {errors.status && (
                     <p className=" text-red-600 mt-3">
-                      {errors.discount.message}
+                      {errors.status.message}
                     </p>
                   )}
                 </div>
+                {/* status field end */}
+                {/* discount field start */}
+                {discountField && (
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text">Discount</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="enter Discount discount percentage"
+                      {...register("discount", {
+                        pattern: {
+                          value: /^\d+(\.\d{0,2})?$/,
+                          message: "Please enter number type value",
+                        },
+                      })}
+                      className={
+                        errors.discount
+                          ? "input input-bordered input-error"
+                          : "input input-bordered input-accent"
+                      }
+                    />
+                    {errors.discount && (
+                      <p className=" text-red-600 mt-3">
+                        {errors.discount.message}
+                      </p>
+                    )}
+                  </div>
+                )}
                 {/* discount field end */}
                 {/* description field start */}
                 <div className="form-control">
@@ -240,7 +290,9 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                   </label>
                   <textarea
                     placeholder="Enter Description"
-                    {...register("description")}
+                    {...register("description", {
+                      required: "description",
+                    })}
                     className={`textarea ${
                       errors?.description ? "textarea-error" : "textarea-accent"
                     }`}
@@ -252,53 +304,6 @@ const UpdateProductModal = ({ setEditProductModal, product }) => {
                   )}
                 </div>
                 {/* description field end */}
-                {/* inStock field start */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">InStock</span>
-                  </label>
-                  <div className="flex items-center gap-5 ml-5">
-                    <div className="flex items-center gap-3">
-                      <input
-                        value={true}
-                        type="radio"
-                        id="inStock"
-                        name="radio-4"
-                        {...register("inStock")}
-                        className="radio radio-accent"
-                      />
-                      <label
-                        for="inStock"
-                        className="hover:text-accent hover:cursor-pointer"
-                      >
-                        In stock
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <input
-                        value={false}
-                        type="radio"
-                        id="sold"
-                        name="radio-4"
-                        {...register("inStock")}
-                        className="radio radio-accent"
-                      />
-                      <label
-                        for="sold"
-                        className="hover:text-accent hover:cursor-pointer"
-                      >
-                        Sold
-                      </label>
-                    </div>
-                  </div>
-
-                  {errors.inStock && (
-                    <p className=" text-red-600 mt-3">
-                      {errors.inStock.message}
-                    </p>
-                  )}
-                </div>
-                {/* inStock field end */}
               </div>
               <button
                 type="submit"

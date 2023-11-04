@@ -3,13 +3,21 @@ const mongoose = require("mongoose");
 //schema design
 const productSchema = mongoose.Schema(
   {
-    name: {
+    title: {
       type: String,
       required: [true, "Please provide a product name"],
       trim: [true, ""],
       unique: [true, "Name must be unique"],
       minLength: [3, "Name must be at least 3 characters"],
       maxLength: [50, "Name is too large"],
+    },
+    img: {
+      type: String,
+      required: [true, "Please provide a product image"],
+    },
+    category: {
+      categoryName: { type: "string", required: true },
+      categoryId: mongoose.Schema.Types.ObjectId,
     },
     description: {
       type: String,
@@ -20,29 +28,8 @@ const productSchema = mongoose.Schema(
       required: true,
       min: [0, "price can't be negative"],
     },
-    unit: {
-      type: String,
-      required: true,
-      enum: {
-        values: ["kg", "liter", "pcs"],
-        message: "unit value can be {VALUE}, must be kg/liter/pcs",
-      },
-    },
-    quantity: {
+    discount: {
       type: Number,
-      required: true,
-      min: [0, "quantity can't be negative"],
-      validate: {
-        validator: (value) => {
-          const isInteger = Number.isInteger(value);
-          if (isInteger) {
-            return true;
-          } else {
-            return false;
-          }
-        },
-      },
-      message: "quantity must be an integer",
     },
     status: {
       type: String,
@@ -52,25 +39,18 @@ const productSchema = mongoose.Schema(
         message: "statue can't be {VALUE}",
       },
     },
-    //   createdAt:{
-    //     type: Date,
-    //     default: Date.now()
-    //   },
-    //   updatedAt:{
-    //     type: Date,
-    //     default: Date.now()
-    //   }
+    keywords: [String],
+    rating: {
+      type: Number, // A number for the rating
+      min: 0, // Minimum value for the rating
+      max: 5, // Maximum value for the rating (assuming a 5-point scale)
+    },
+    like: [{ _id: mongoose.Schema.Types.ObjectId }],
 
     // supplier: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "Users",
     // },
-    // categories: [
-    //   {
-    //     name: { type: "string", required: true },
-    //     _id: mongoose.Schema.Types.ObjectId,
-    //   },
-    // ],
   },
   {
     timestamps: true,
@@ -80,5 +60,6 @@ const productSchema = mongoose.Schema(
 // schema --> model --> query
 
 const Product = mongoose.model("Product", productSchema);
+// console.log(Product);
 
 module.exports = Product;
