@@ -11,7 +11,6 @@ import {
 } from "../../../../features/productSlice/productApi";
 import toast from "react-hot-toast";
 import UpdateProductModal from "./UpdateProductModal/UpdateProductModal";
-import ReactPaginate from "react-paginate";
 import Pagination from "../../../Shared/Pagination/Pagination";
 
 const Products = () => {

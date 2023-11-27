@@ -1,5 +1,2 @@
-const productData = {
-  keywords: [],
-  rating: [],
-  like: [],
-};
+products: [...ProductInfo],  
+      orderStatus: "pending",

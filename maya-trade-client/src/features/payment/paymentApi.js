@@ -5,13 +5,14 @@ const paymentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     checkout: builder.mutation({
       query: (data) => ({
-        url: "/checkout",
+        url: "/order/checkout",
         method: "POST",
         body: data,
       }),
       async onQueryStarted(data, { dispatch, queryFulfilled }) {
         try {
           const res = await queryFulfilled;
+          console.log("checkout", res);
           if (!res.data.success) {
             toast.error(res.data.message);
             return;
