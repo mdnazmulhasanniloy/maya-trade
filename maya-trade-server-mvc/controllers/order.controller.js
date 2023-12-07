@@ -34,27 +34,11 @@ exports.getOrder = async (req, res, next) => {
 //add Product
 exports.createOrder = async (req, res, next) => {
   try {
-    //save or create way 1
-    // console.log(req.body);
     const result = await createOrderService(req.body, res);
-
-    // console.log("result", result);
-    return;
-
-    if (GatewayPageURL) {
-      res.send({ success: true, url: GatewayPageURL });
-      return;
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "data successfully inserted",
-      data: result,
-    });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "data inserted failed",
+      message: "order inserted failed",
       data: error.message,
     });
   }

@@ -5,15 +5,10 @@ import { MdOutlineDashboardCustomize } from "react-icons/md";
 
 const AdminNavLinks = [
   {
-    name: "Products List",
+    name: "Products",
     path: "dashboard/products-list",
     icon: <FaClipboardList className="text-2xl" />,
-  },
-  {
-    name: "Add Product",
-    path: "dashboard/add-product",
-    icon: <FiShoppingBag className="text-2xl" />,
-  },
+  }, 
   {
     name: "Orders",
     path: "dashboard/orders",

@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import emptyImg from "../../assets/EmptyCart/EmptyCart.jpg";
 import CartCard from "../../Components/CartCard/CartCard";
 import { useCheckoutMutation } from "../../features/payment/paymentApi";
+import { setCartFormLocalStorage } from "../../features/cart/cartSlice";
 
 const Cart = () => {
   const carts = useSelector((state) => state?.cart?.carts);
+  const dispatch = useDispatch();
   const {
     user: { _id },
   } = useSelector((state) => state?.auth);
@@ -15,6 +17,15 @@ const Cart = () => {
     totalPrice: 0,
     deliveryFee: 250, // Initialize deliveryFee here
   });
+
+  useEffect(() => {
+    const localstorage = localStorage.getItem("cart");
+    if (localstorage) {
+      const products = JSON.parse(localstorage);
+      dispatch(setCartFormLocalStorage([...products]));
+      localStorage.removeItem("cart");
+    }
+  }, []);
 
   useEffect(() => {
     const subTotal = carts.reduce((total, cartItem) => {
@@ -35,7 +46,7 @@ const Cart = () => {
   }, [carts, price?.deliveryFee, setPrice]); // Include only carts and price.deliveryFee as dependencies
 
   // Check if the cart is empty correctly
-  if (carts?.length === 0) {
+  if (!carts?.length > 0) {
     return (
       <div className="h-screen w-screen flex flex-col items-center mt-10">
         <img src={emptyImg} className="w-96" alt="" />
@@ -46,12 +57,14 @@ const Cart = () => {
   }
 
   const handelToCheckout = async () => {
+    localStorage.setItem("cart", JSON.stringify(carts));
     let ProductInfo = [];
     const product = await carts?.map((product) =>
-      ProductInfo.push({ _id: product?._id, quantity: product?.quantity })
+      ProductInfo.push({ product: product?._id, quantity: product?.quantity })
     );
-    console.log(ProductInfo);
-    checkout({ ProductInfo, userId: _id, price: price?.totalPrice });
+    const paymentInfo = { ProductInfo, userId: _id, price: price?.totalPrice };
+    console.log("paymentInfo", paymentInfo);
+    checkout(paymentInfo);
   };
 
   return (

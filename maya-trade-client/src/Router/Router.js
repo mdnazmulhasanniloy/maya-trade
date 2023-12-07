@@ -8,14 +8,13 @@ import Cart from "../Pages/Cart/Cart";
 import Login from "../Pages/Login/Login";
 import Register from "../Pages/Register/Register";
 import Profile from "../Pages/Profile/Profile";
-import EditProfile from "../Pages/Profile/EditProfile/EditProfile";
 import UserRegister from "./../Pages/Register/UserRegister";
 import Dashboard from "../Layout/DashboardLayout/Dashboard";
 import Orders from "./../Pages/Dashboard/Admin/Orders/Orders";
-import ProductList from "./../Pages/Dashboard/Admin/ProductList/ProductList";
 import Products from "../Pages/Dashboard/Admin/Products/Products";
 import Category from "../Pages/Dashboard/Admin/Category/Category";
 import PaymentSuccess from "../Pages/Dashboard/Buyers/PaymentSuccess/PaymentSuccess";
+import MyOrders from "./../Pages/Dashboard/Buyers/MyOrders/MyOrders";
 
 export const Router = createBrowserRouter([
   {
@@ -55,6 +54,10 @@ export const Router = createBrowserRouter([
         path: "/profile",
         element: <Profile />,
       },
+      {
+        path: "/payment/success/:tranId",
+        element: <PaymentSuccess />,
+      },
     ],
   },
   {
@@ -62,28 +65,20 @@ export const Router = createBrowserRouter([
     element: <Dashboard />,
     children: [
       {
-        path: "/dashboard",
-        element: <ProductList />,
-      },
-      {
         path: "dashboard/products-list",
-        element: <ProductList />,
+        element: <Products />,
       },
       {
         path: "dashboard/category",
         element: <Category />,
       },
       {
-        path: "dashboard/add-product",
-        element: <Products />,
-      },
-      {
         path: "dashboard/orders",
         element: <Orders />,
       },
       {
-        path: "dashboard/payment/success/:tranId",
-        element: <PaymentSuccess />,
+        path: "dashboard/my-orders",
+        element: <MyOrders />,
       },
     ],
   },

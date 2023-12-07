@@ -13,13 +13,15 @@ const paymentApi = apiSlice.injectEndpoints({
         try {
           const res = await queryFulfilled;
           console.log("checkout", res);
-          if (!res.data.success) {
-            toast.error(res.data.message);
+          if (!res?.data?.success) {
+            toast.error(res?.data?.message);
             return;
           }
-          window.location.replace(res.data.url);
+          window.location.replace(res?.data?.url);
           console.log("url", res);
-        } catch (error) {}
+        } catch (error) {
+          toast.error(error.message);
+        }
       },
     }),
   }),

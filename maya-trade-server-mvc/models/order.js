@@ -14,11 +14,11 @@ const orderSchema = mongoose.Schema(
     user: {
       type: ObjectId,
       required: [true, "User is required"],
-      ref: "user",
+      ref: "User",
     },
     products: [
       {
-        _id: {
+        product: {
           type: ObjectId,
           ref: "Product",
         },

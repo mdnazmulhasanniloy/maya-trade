@@ -5,18 +5,25 @@ import { MdOutlineSettings, MdOutlineLogout } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
 import AdminNavLinks from "./AdminNavLink";
 import style from "./DashboardNav.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../../features/authSlice/authSlice";
 import { signOut } from "firebase/auth";
 import auth from "../../../../Firebase/Firebase.config";
 import toast from "react-hot-toast";
 import { FaHome } from "react-icons/fa";
 import { GrClose } from "react-icons/gr";
+import BuyerNavLink from "./BuyerNavLinkData";
 
 const DashboardNav = () => {
+  const { role } = useSelector((state) => state?.auth?.user);
   const [open, setOpen] = useState(false);
-  const navLinks = AdminNavLinks;
   const dispatch = useDispatch();
+  let navLinks = [];
+  if (role === "admin") {
+    navLinks = AdminNavLinks;
+  } else if (role === "buyer") {
+    navLinks = BuyerNavLink;
+  }
 
   const handelToSignOut = () => {
     dispatch(logout());
@@ -42,7 +49,7 @@ const DashboardNav = () => {
               </div>
             </div>
             <div className=" my-4 border-b border-gray-100 pb-4">
-              {navLinks.map((link) => (
+              {navLinks?.map((link) => (
                 <NavLink
                   state={style}
                   to={link?.path}

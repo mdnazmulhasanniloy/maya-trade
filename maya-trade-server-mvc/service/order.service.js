@@ -21,8 +21,6 @@ const tranId = uuidv4();
 
 exports.createOrderService = async (req, res) => {
   const { ProductInfo, userId, price } = req;
-  // console.log(userId);
-
   const user = await User.findById(userId);
 
   if (!user) {
@@ -67,39 +65,45 @@ exports.createOrderService = async (req, res) => {
     ship_postcode: 1000,
     ship_country: "Bangladesh",
   };
-
   const sslcz = new SSLCommerzPayment(
     payment_tore_id,
     payment_tore_passwd,
     is_live
   );
 
-  sslcz?.init(data)?.then(async (apiResponse) => {
-    // Redirect the user to payment gateway
-    let GatewayPageURL = apiResponse?.GatewayPageURL;
-    res.send({ success: true, url: GatewayPageURL });
-    const finalOrder = await {
-      products: [...ProductInfo],
-      user: userId,
-      paidStatus: false,
-      transitionId: tranId.toString(),
-      orderStatus: "order-pending",
-    };
-    console.log("finalOrder", finalOrder);
-    const order = await Order.create(finalOrder);
-    console.log("order", order);
-  });
-
-  return;
-  //   console.log(user);
-  //   const order = await Order.create(data);
-  //   return order;
+  sslcz
+    ?.init(data)
+    ?.then(async (apiResponse) => {
+      // Redirect the user to payment gateway
+      let GatewayPageURL = apiResponse?.GatewayPageURL;
+      res.status(200).send({ success: true, url: GatewayPageURL });
+      const finalOrder = await {
+        products: [...ProductInfo],
+        user: userId,
+        paidStatus: false,
+        price: price,
+        transitionId: tranId.toString(),
+        orderStatus: "order-pending",
+      };
+      const order = await Order.create(finalOrder);
+    })
+    .catch((err) => {
+      res.status(400).send({
+        success: false,
+        data: err?.message,
+        message: "Payment is field",
+      });
+    });
 };
 
 // update a order by id
 exports.updateOrderService = async (_id, data) => {
-  const order = await Order.findOneAndUpdate({ _id: _id }, data);
-  return order;
+  try {
+    const order = await Order.findOneAndUpdate({ _id: _id }, data);
+    return order;
+  } catch (error) {
+    return error;
+  }
 };
 
 //delete a Order

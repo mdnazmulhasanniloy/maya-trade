@@ -31,7 +31,7 @@ const NavBar = () => {
   } = useSelector((state) => state?.auth);
 
   const dispatch = useDispatch();
-  console.log(email);
+  // console.log(email);
 
   const handelToSignOut = () => {
     dispatch(logout());

@@ -44,10 +44,19 @@ const cartSlice = createSlice({
         selectedProduct.quantity -= 1;
       }
     },
+
+    setCartFormLocalStorage: (state, action) => {
+      state.carts = action?.payload;
+    },
   },
 });
 
-export const { addToCart, removeFromCart, quantityMinus } = cartSlice?.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  quantityMinus,
+  setCartFormLocalStorage,
+} = cartSlice?.actions;
 
 const cartReducer = cartSlice?.reducer;
 

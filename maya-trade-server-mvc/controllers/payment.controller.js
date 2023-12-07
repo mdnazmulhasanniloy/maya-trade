@@ -1,24 +1,52 @@
-const { PaymentSuccessService } = require("../service/payment.service");
+const {
+  PaymentSuccessService,
+  GetOrderWidthTranIdService,
+} = require("../service/payment.service");
 
+//get order
+
+exports.getOrder = async (req, res) => {
+  try {
+    const tranId = req.params.tranId;
+    const result = await GetOrderWidthTranIdService(tranId);
+    console.log(result);
+    if (!result) {
+      return res
+        .status(404)
+        .send({ success: false, message: "Order not found", data: result });
+    }
+
+    res
+      .status(200)
+      .send({ success: true, message: "Order successfully get", data: result });
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      message: "Order not founds",
+      data: error.message,
+    });
+  }
+};
+
+//update order
 exports.paymentSuccess = async (req, res, next) => {
   try {
     const tranId = req.params.tranId;
-    //save or create way 1
-    // console.log(req.body);
-    const result = await PaymentSuccessService(tranId, res);
+    const result = await PaymentSuccessService(tranId);
 
-    res.send({ result });
-    return;
+    if (!result) {
+      return res.status(400).json({
+        success: false,
+        message: "payment is failed",
+        data: result,
+      });
+    }
 
-    // res.status(200).json({
-    //   success: true,
-    //   message: "data successfully inserted",
-    //   data: result,
-    // });
+    res.redirect(`http://localhost:3000/payment/success/${tranId}`);
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "payment is error",
+      message: "payment is failed",
       data: error.message,
     });
   }

@@ -43,7 +43,6 @@ export const googleSignIn = createAsyncThunk("auth/googleSignIn", async () => {
 export const getUser = createAsyncThunk("auth/getUser", async (email) => {
   const res = await fetch(`${process.env.REACT_APP_devURL}user/${email}`);
   const data = await res.json();
-  console.log("data", data);
   if (data.success) {
     return data;
   }
