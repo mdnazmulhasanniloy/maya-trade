@@ -5,7 +5,7 @@ const paymentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     checkout: builder.mutation({
       query: (data) => ({
-        url: "/order/checkout",
+        url: "/payment",
         method: "POST",
         body: data,
       }),

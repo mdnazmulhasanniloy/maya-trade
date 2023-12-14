@@ -1,3 +1,5 @@
+const { access_Token } = require("../config");
+const ApiError = require("../errors/apiError");
 const {
   getUserService,
   createUserService,
@@ -40,13 +42,9 @@ exports.getUsersByEmail = async (req, res, next) => {
     const result = await getUsersByEmailService(email);
     // console.log(result);
     if (result) {
-      const token = jwt.sign(
-        { email: result?.email },
-        process.env.ACCESS_TOKEN,
-        {
-          expiresIn: "3d",
-        }
-      );
+      const token = jwt.sign({ email: result?.email }, access_Token, {
+        expiresIn: "3d",
+      });
       return res.status(200).json({
         success: true,
         data: { ...result?._doc, accessToken: token },
@@ -62,11 +60,12 @@ exports.getUsersByEmail = async (req, res, next) => {
       });
     }
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "users loaded failed",
-      data: error.message,
-    });
+    throw new ApiError(400, "users not found");
+    // res.status(400).json({
+    //   success: false,
+    //   message: "users loaded failed",
+    //   data: error.message,
+    // });
   }
 };
 //add users

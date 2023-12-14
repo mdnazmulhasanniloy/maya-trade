@@ -1,7 +1,22 @@
+const ApiError = require("../errors/apiError");
 const {
   PaymentSuccessService,
   GetOrderWidthTranIdService,
+  initPayment,
+  webhookService,
 } = require("../service/payment.service");
+
+// create a payment
+exports.createPayment = async (req, res, next) => {
+  try {
+    // console.log("first");
+    const payment = await initPayment(req.body, res);
+    // console.log(payment);
+    res.send({ success: true, url: payment?.redirectGatewayURL });
+  } catch (error) {
+    next(error);
+  }
+};
 
 //get order
 
@@ -49,5 +64,16 @@ exports.paymentSuccess = async (req, res, next) => {
       message: "payment is failed",
       data: error.message,
     });
+  }
+};
+
+exports.webhook = async (req, res, next) => {
+  try {
+    const result = await webhookService(req.body);
+    res
+      .status(200)
+      .send({ success: true, message: "payment verified", data: result });
+  } catch (error) {
+    throw new ApiError(400, error);
   }
 };

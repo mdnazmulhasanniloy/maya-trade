@@ -44,6 +44,10 @@ const orderSchema = mongoose.Schema(
         message: "Status can't be {VALUE}",
       },
     },
+    price: {
+      type: Number,
+      required: [true, "Price is required"],
+    },
   },
   {
     timestamps: true,

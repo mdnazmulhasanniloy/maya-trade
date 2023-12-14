@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv").config();
 const colors = require("colors");
 const app = require("./app");
+const { port, db_url } = require("./config");
 
 //database connection
 
-mongoose.connect(process.env.DATABASE_URL).then(() => {
+mongoose.connect(db_url).then(() => {
   console.log(`Database connection successful`.green.bold);
 });
 
 //server
-const port = process.env.SERVER_PORT || 5000;
+const Port = port || 5000;
 
 app.listen(port, () => {
-  console.log(`App is running on prot ${port}`.yellow.bold);
+  console.log(`App is running on prot ${Port}`.yellow.bold);
 });
