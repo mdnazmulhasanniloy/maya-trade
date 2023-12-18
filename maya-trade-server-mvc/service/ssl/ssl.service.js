@@ -1,7 +1,7 @@
 const { default: axios } = require("axios");
 const ApiError = require("../../errors/apiError");
 const User = require("../../models/user");
-const { ssl_payment_url, store_id, store_password } = require("../../config");
+const { ssl_payment_url, store_id, store_password, server_url } = require("../../config");
 
 const initPayment = async (payload) => {
   try {
@@ -10,7 +10,7 @@ const initPayment = async (payload) => {
       store_id: store_id,
       store_passwd: store_password,
       currency: "BDT", // use unique tran_id for each api call
-      success_url: `http://localhost:2000/api/v1/payment/success/${payload?.tran_id}`,
+      success_url: `${server_url}payment/success/${payload?.tran_id}`,
       fail_url: "http://localhost:3030/fail",
       cancel_url: "http://localhost:3030/cancel",
       ipn_url: "http://localhost:3030/ipn",

@@ -6,6 +6,7 @@ import NewArrivals from "./NewArrivals/NewArrivals";
 import BigDiscount from "./BigDiscount/BigDiscount";
 import HomePageProduct from "./HomePageProduct/HomePageProduct";
 import { useRegisterMutation } from "../../features/authSlice/authApi";
+import { serverUrl } from "../../Config";
 
 const Home = () => {
   const [register, { isLoading, isSuccess, isError }] = useRegisterMutation();
@@ -13,7 +14,7 @@ const Home = () => {
   // const handelhello = () => {
   //   register("mdnazmulhasanniloy323@gmail.com");
   // };
-
+  console.log("serverUrl", serverUrl);
   useEffect(() => {
     console.log(
       "isLoading:",

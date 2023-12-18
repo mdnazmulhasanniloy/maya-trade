@@ -5,6 +5,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import auth, { googleAuthProvider } from "../../Firebase/Firebase.config";
+import { serverUrl } from "../../Config";
 
 const initialState = {
   user: { email: null },
@@ -41,7 +42,7 @@ export const googleSignIn = createAsyncThunk("auth/googleSignIn", async () => {
 });
 
 export const getUser = createAsyncThunk("auth/getUser", async (email) => {
-  const res = await fetch(`${process.env.REACT_APP_devURL}user/${email}`);
+  const res = await fetch(`${serverUrl}user/${email}`);
   const data = await res.json();
   if (data.success) {
     return data;

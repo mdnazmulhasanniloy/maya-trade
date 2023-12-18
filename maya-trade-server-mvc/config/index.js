@@ -3,6 +3,7 @@ const dotenv = require("dotenv").config();
 exports.db_url = process.env.DATABASE_URL;
 exports.port = process.env.SERVER_PORT;
 exports.nod_env = process.env.NODE_ENV;
+exports.server_url = process.env.SERVER_URL;
 
 exports.access_Token = process.env.ACCESS_TOKEN;
 
