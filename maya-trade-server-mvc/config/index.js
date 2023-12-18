@@ -1,9 +1,18 @@
 const dotenv = require("dotenv").config();
 
+const clientUrl = (payload) => {
+    if (payload === "development") { 
+      return "http://localhost:3000/";
+    } else {
+      return "https://maya-trade-client.vercel.app/";
+    }
+  };
+
 exports.db_url = process.env.DATABASE_URL;
 exports.port = process.env.SERVER_PORT;
 exports.nod_env = process.env.NODE_ENV;
 exports.server_url = process.env.SERVER_URL;
+exports.client_url = clientUrl(this.nod_env);
 
 exports.access_Token = process.env.ACCESS_TOKEN;
 

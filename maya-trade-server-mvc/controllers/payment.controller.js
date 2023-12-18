@@ -1,3 +1,4 @@
+const { client_url } = require("../config");
 const ApiError = require("../errors/apiError");
 const {
   PaymentSuccessService,
@@ -56,8 +57,8 @@ exports.paymentSuccess = async (req, res, next) => {
         data: result,
       });
     }
-
-    res.redirect(`http://localhost:3000/payment/success/${tranId}`);
+ 
+    res.redirect(`${client_url}payment/success/${tranId}`);
   } catch (error) {
     res.status(400).json({
       success: false,
