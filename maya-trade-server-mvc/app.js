@@ -13,6 +13,7 @@ const CategoryRouter = require("./routes/category.route");
 const OrderRouter = require("./routes/order.route");
 const PaymentRouter = require("./routes/payment.route");
 const ErrorHandler = require("./middlewares/globalErrorHandler");
+const ApiError = require("./errors/apiError");
 
 //posting to database
 
@@ -21,6 +22,14 @@ app.use("/api/v1/product", ProductRouter);
 app.use("/api/v1/category", CategoryRouter);
 app.use("/api/v1/order", OrderRouter);
 app.use("/api/v1/payment", PaymentRouter);
+
+app.get("/", async (req, res, next) => {
+  try {
+    res.send(`simple server is running`);
+  } catch (error) {
+    throw new ApiError(error);
+  }
+});
 
 // rout not defiant
 app.all("*", (req, res, next) => {
